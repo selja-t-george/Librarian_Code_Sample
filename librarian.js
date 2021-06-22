@@ -1,5 +1,6 @@
 const request = require('request');
 
+//script to interact with the library. Edit this block to mock different scenarios and sequences
 const script = () => {
     var cork_city = new Library();
     cork_city.lookup('9781472258229');
@@ -16,6 +17,8 @@ const script = () => {
     cork_city.stock();
 };
 
+//block for fetching the catalogue from the github link. The data is fetched and added to a map with 
+//ISBN as key and book object as value
 const catalogue = new Map();
 request.get('https://raw.githubusercontent.com/DenisColeman/thelibarian/main/catalog.csv',
     function (error, response, body) {
@@ -32,6 +35,8 @@ request.get('https://raw.githubusercontent.com/DenisColeman/thelibarian/main/cat
         }
     }
 );
+
+//The book class which specifies the attributes of each books in the library
 class book {
     constructor(isbn, name, author, year, copies, available) {
         this.isbn = isbn;
@@ -42,12 +47,16 @@ class book {
         this.available = available;
     }
 }
+
+//The library class
 class Library {
     books = new Map();
+    //When instantiated, the books map is assigned with catalogue
     constructor() {
         this.books = catalogue;
     }
 
+    //lookup function to search the library for details of a book
     lookup(lookup_isbn) {
         if (this.books.has(lookup_isbn)) {
             let library_book = this.books.get(lookup_isbn);
@@ -58,6 +67,7 @@ class Library {
         }
     }
 
+    //Add one or multiple copies of a book
     add(isbn, count = 1) {
         if (this.books.has(isbn)) {
             var library_book = this.books.get(isbn);
@@ -69,6 +79,7 @@ class Library {
         }
     }
 
+    //Borrow a book from the library
     borrow(isbn) {
         if (this.books.has(isbn)) {
             var library_book = this.books.get(isbn);
@@ -83,6 +94,7 @@ class Library {
         }
     }
 
+    //Return a book to the library.
     return_book(isbn) {
         if (this.books.has(isbn)) {
             var library_book = this.books.get(isbn);
@@ -94,6 +106,7 @@ class Library {
         }
     }
 
+    //Call this function to return the stock details of all books in the library.
     stock() {
         this.books.forEach((value) => {
             console.log(value.isbn + ', Copies: ' + value.copies + ', Available: ' + value.available
